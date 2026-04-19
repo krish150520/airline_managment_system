@@ -27,14 +27,33 @@ class ScheduleTab(QWidget):
         self.load()
 
     def load(self):
-        try:
-            conn = get_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM flight_schedule")
-            rows = cur.fetchall()
-            cur.close(); conn.close()
-            fill_table(self.table, rows,
-                       ["Flight ID", "Airline", "Source", "Destination"])
-        except Exception as e:
-            err(self, str(e))
+         try:
+             conn = get_connection()
+             cur = conn.cursor()
+     
+             cur.execute("""
+                 SELECT 
+                     flight_id, 
+                     airline, 
+                     source, 
+                     destination,
+                     departure_time,
+                     arrival_time
+                 FROM flight_schedule
+             """)
 
+             rows = cur.fetchall()
+
+             fill_table(
+                 self.table,
+                 rows,
+                 ["Flight ID", "Airline", "Source", "Destination", "Departure", "Arrival"]
+             )
+
+             self.table.resizeColumnsToContents()
+     
+             cur.close()
+             conn.close()
+
+         except Exception as e:
+             err(self, str(e))
